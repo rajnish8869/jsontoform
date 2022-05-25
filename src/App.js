@@ -1,35 +1,60 @@
 import "./styles.css";
 import React from "react";
 import QRCode from "react-qr-code";
-import data from "./data.json";
+// import data from "./data.json";
+// import RichTextEditor from "react-rte";
+import { Rating } from "react-simple-star-rating";
+import newData from "./newData.json";
 
 export default function App() {
   function renderFormElement() {
-    console.log("data.layout", data);
-    return data.map((e) => {
-      if (
-        (e.elementType == "text" && e.fieldType == "text") ||
-        (e.elementType == "number" && e.fieldType == null) ||
-        (e.elementType == "date" && e.fieldType == null)
-      ) {
+    return newData.map((e) => {
+      if (e.elementType == "text") {
+        if (e.fieldType == "email") {
+          return (
+            <div className="form-group" key={e.id}>
+              <label>{e.fieldName}</label>
+              <input
+                type={e.fieldType}
+                className="form-control"
+                placeholder={e.placeholder}
+                required={e.required}
+                value={e.defaultValue}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                }}
+              />
+            </div>
+          );
+        } else if (e.fieldType == null) {
+          return (
+            <div className="form-group" key={e.id}>
+              <label>{e.fieldName}</label>
+              <input
+                type={e.elementType}
+                className="form-control"
+                placeholder={e.placeholder}
+                value={e.defaultValue}
+                required={e.required}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                }}
+              />
+            </div>
+          );
+        }
+      } else if (e.elementType == "number") {
         return (
-          <div
-            class="form-group"
-            style={{
-              position: "absolute",
-              left: `${(e.x / 12) * 100}%`,
-              top: `${(e.y / 10) * 100}%`,
-              height: `${(e.h / 10) * 100}%`,
-              width: `${100 / e.w}vw`,
-            }}
-          >
-            <label for={e.id}>{e.placeholder}</label>
+          <div className="form-group" key={e.id}>
+            <label>{e.fieldName}</label>
             <input
               type={e.elementType}
               className="form-control"
-              id={e.id}
               placeholder={e.placeholder}
-              value={e.value}
+              value={e.defaultValue}
+              required={e.required}
               style={{
                 height: "100%",
                 width: "100%",
@@ -37,51 +62,31 @@ export default function App() {
             />
           </div>
         );
-      } else if (e.elementType == "text" && e.fieldType == "email") {
+      } else if (e.elementType == "date") {
         return (
-          <div
-            class="form-group"
-            style={{
-              position: "absolute",
-              left: `${(e.x / 12) * 100}%`,
-              top: `${(e.y / 10) * 100}%`,
-              height: `${(e.h / 10) * 100}%`,
-              width: `${100 / e.w}vw`,
-            }}
-          >
-            <label for={e.id}>{e.placeholder}</label>
+          <div className="form-group" key={e.id}>
+            <label>{e.fieldName}</label>
             <input
-              type={e.fieldType}
+              type={e.elementType}
               className="form-control"
-              id={e.id}
               placeholder={e.placeholder}
-              value={e.value}
+              value={e.defaultValue}
+              required={e.required}
               style={{
                 height: "100%",
                 width: "100%",
               }}
+              min="2018-01-01"
+              max="2018-12-31"
             />
           </div>
         );
       } else if (e.elementType == "dropdown") {
-        if (e.multiSelect == true) {
+        if (e.multiSelect == false) {
           return (
-            <div
-              class="form-group"
-              style={{
-                position: "absolute",
-                left: `${(e.x / 12) * 100}%`,
-                top: `${(e.y / 10) * 100}%`,
-                height: `${(e.h / 10) * 100}%`,
-                width: `${100 / e.w}vw`,
-              }}
-            >
-              <label for={e.id}>{e.placeholder}</label>
-              <select
-                class="form-control selectpicker"
-                id="exampleFormControlSelect1"
-                multiple
-              >
+            <div className="form-group" key={e.id}>
+              <label>{e.fieldName}</label>
+              <select className="form-control " required={e.required}>
                 <option value="">Select</option>
                 {e.choices.map((option) => {
                   return (
@@ -95,18 +100,14 @@ export default function App() {
           );
         } else {
           return (
-            <div
-              class="form-group"
-              style={{
-                position: "absolute",
-                left: `${(e.x / 12) * 100}%`,
-                top: `${(e.y / 10) * 100}%`,
-                height: `${(e.h / 10) * 100}%`,
-                width: `${100 / e.w}vw`,
-              }}
-            >
-              <label for={e.id}>{e.placeholder}</label>
-              <select class="form-control" id="exampleFormControlSelect1">
+            <div className="form-group" key={e.id}>
+              <label>{e.fieldName}</label>
+              <select
+                className="form-control"
+                multiple
+                required={e.required}
+                size="1"
+              >
                 <option value="">Select</option>
                 {e.choices.map((option) => {
                   return (
@@ -121,111 +122,70 @@ export default function App() {
         }
       } else if (e.elementType == "radio") {
         return (
-          <div
-            style={{
-              position: "absolute",
-              left: `${(e.x / 12) * 100}%`,
-              top: `${(e.y / 10) * 100}%`,
-              height: `${(e.h / 10) * 100}%`,
-              width: `${100 / e.w}vw`,
-            }}
-          >
+          <div key={e.id}>
             <div>
-              <label for={e.id}>{e.label}</label>
+              <label>{e.fieldName}</label>
             </div>
             {e.choices.map((option) => {
               return (
                 <div
+                  key={option.id}
                   className={
-                    e.VAxis == true
+                    e.VAxis == "true"
                       ? " form-check "
                       : " form-check form-check-inline"
                   }
                 >
                   <input
-                    class="form-check-input"
+                    className="form-check-input"
                     type="radio"
-                    name="inlineRadioOptions"
+                    name={option.key}
                     id={e.id}
-                    value="option1"
+                    value={option.choice}
+                    required={e.required}
                   />
-                  <label class="form-check-label" for="inlineRadio1">
-                    {option.choice}
-                  </label>
+                  <label className="form-check-label">{option.choice}</label>
                 </div>
               );
             })}
           </div>
         );
-      } else if (e.elementType == "checkbox") {
-        return (
-          <div
-            style={{
-              position: "absolute",
-              left: `${(e.x / 12) * 100}%`,
-              top: `${(e.y / 10) * 100}%`,
-              height: `${(e.h / 10) * 100}%`,
-              width: `${100 / e.w}vw`,
-            }}
-          >
-            <div>
-              <label for={e.id}>{e.label}</label>
-            </div>
-            <div class="form-check form-check-inline">
+      } else if (e.elementType == "rating") {
+        if (e.ratingType == "slider") {
+          return (
+            <div className="form-group" key={e.id}>
+              <label>{e.fieldName}</label>
               <input
-                class="form-check-input"
-                type="checkbox"
-                name="inlineRadioOptions"
-                id={e.id}
-                value="option1"
+                type={"range"}
+                min="0"
+                max={e.ratingScale}
+                className="form-control-range"
+                value={e.value}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                }}
               />
             </div>
-            <label for={e.id}>{e.placeholder}</label>
-          </div>
-        );
-      } else if (e.elementType == "range") {
-        return (
-          <div
-            class="form-group"
-            style={{
-              position: "absolute",
-              left: `${(e.x / 12) * 100}%`,
-              top: `${(e.y / 10) * 100}%`,
-              // height: `${(e.h / 10) * 100}%`,
-              width: `${100 / e.w}vw`,
-            }}
-          >
-            <label for={e.id}>{e.placeholder}</label>
-            <input
-              type={e.elementType}
-              className="form-control-range"
-              id={e.id}
-              value={e.value}
-              // style={{
-              //   height: "100%",
-              //   width: "100%",
-              // }}
-            />
-          </div>
-        );
+          );
+        } else if (e.ratingType == "star") {
+          return (
+            <div className="form-group" key={e.id}>
+              <label>{e.fieldName}</label>
+              <Rating ratingValue="5" iconsCount={e.ratingScale} />
+            </div>
+          );
+        }
       } else if (e.elementType == "file") {
         return (
-          <div
-            class="form-group"
-            style={{
-              position: "absolute",
-              left: `${(e.x / 12) * 100}%`,
-              top: `${(e.y / 10) * 100}%`,
-              height: `${(e.h / 10) * 100}%`,
-              width: `${100 / e.w}vw`,
-            }}
-          >
-            <label for={e.id}>{e.placeholder}</label>
+          <div className="form-group" key={e.id}>
+            <label>{e.fieldName}</label>
             <input
               type={e.elementType}
-              class="form-control-file"
+              className="form-control-file"
               id={e.id}
-              value={e.value}
+              value=""
+              required={e.required}
               style={{
                 height: "100%",
                 width: "100%",
@@ -235,23 +195,14 @@ export default function App() {
         );
       } else if (e.elementType == "image") {
         return (
-          <div
-            class="form-group"
-            style={{
-              position: "absolute",
-              left: `${(e.x / 12) * 100}%`,
-              top: `${(e.y / 10) * 100}%`,
-              height: `${(e.h / 10) * 100}%`,
-              width: `${100 / e.w}vw`,
-            }}
-          >
-            <label for={e.id}>{e.placeholder}</label>
+          <div className="form-group" key={e.id}>
+            <label>{e.fieldName}</label>
             <input
               type="file"
               accept="image/*"
-              class="form-control-file"
-              id={e.id}
-              value={e.value}
+              className="form-control-file"
+              value=""
+              required={e.required}
               style={{
                 height: "100%",
                 width: "100%",
@@ -259,25 +210,44 @@ export default function App() {
             />
           </div>
         );
-      } else if (e.elementType == "qrcode") {
+      } else if (e.elementType == "checkbox") {
         return (
-          <div
-            class="form-group"
-            style={{
-              position: "absolute",
-              left: `${(e.x / 12) * 100}%`,
-              top: `${(e.y / 10) * 100}%`,
-              height: `${(e.h / 10) * 100}%`,
-              width: `${100 / e.w}vw`,
-            }}
-          >
+          <div>
             <div>
-              <label for={e.id}>{e.label}</label>
+              <label>{e.fieldName}</label>
             </div>
-            <QRCode value={e.placeholder} size={50} />
+            {e.choices.map((option) => {
+              return (
+                <div
+                  key={option.id}
+                  className={
+                    e.VAxis == true
+                      ? "form-check"
+                      : " form-check form-check-inline"
+                  }
+                >
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name={option.key}
+                    value={option.choice}
+                    required={e.required}
+                  />
+                  <label className="form-check-label">{option.choice}</label>
+                </div>
+              );
+            })}
           </div>
         );
-      } else {
+      } else if (e.elementType == "qrcode") {
+        return (
+          <div className="form-group" key={e.id}>
+            <div>
+              <label>{e.fieldName}</label>
+            </div>
+            <QRCode value={e.fieldName} size={50} />
+          </div>
+        );
       }
     });
   }
